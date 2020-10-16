@@ -182,11 +182,12 @@ class CharacterSelection {
     serialize(situationID) {
         let txt = $('#' + situationID).text().substring(start, end);
         let quality_name = quality_map[situationID][this.num]
-        let new_quality_name = quality_name.replace(/,/g, "<SEP>"); 
+        let new_quality_name = quality_name.replace(/,/g, "_SEP_");
+        new_quality_name = new_quality_name.replace(/"/g, "_QUOTE_");
         console.log($('#' + situationID).text())
         // console.log($('#' + situationID).text().substring(0, 5))
         console.log($('#' + situationID).text().length)
-        return '[' + new_quality_name + ',' + this.start + ',' + this.end + ']';
+        return '["' + new_quality_name + '",' + this.start + ',' + this.end + ']';
     }
 }
 
@@ -215,6 +216,13 @@ $(document).ready(function () {
     AC.init(situationIDs);
     var pageX;
     var pageY;
+    $(document).on('mousedown', function(e){
+        var selector = $("#quality-selection");
+        if (!selector.is(e.target) &&
+            !selector.has(e.target).length) {
+                selector.fadeOut(1);
+        }
+    });
     $(situationIDsJquery.join(',')).on("mousedown", function(e){
         pageX = e.pageX;
         pageY = e.pageY;
@@ -273,6 +281,9 @@ $(document).ready(function () {
 
         // get text input value
         var input_text = document.getElementById("text_input").value;
+        let new_input_text = input_text.replace(/"/g, "_QUOTE_");
+        new_input_text = new_input_text.replace(/</g, "_LEFT_");
+        new_input_text = new_input_text.replace(/>/g, "_RIGHT_");
         // add any characters. (moving end back to exclusive model)
         if (input_text.trim() != "") {
             var quality_list = quality_map[situationID]
@@ -282,7 +293,7 @@ $(document).ready(function () {
                 let display = $('#' + situationID + "-display")
                 var p = $("<h2>" + input_text + "</h2>")
                 p.css('color', all_colors[quality_list.length % all_colors.length]);
-                p.attr('id', situationID + "-quality-" + input_text)
+                p.attr('id', situationID + "-quality-" + new_input_text)
                 p.attr('contentEditable', "true")
                 p.attr('data-situation-id', situationID)
                 p.attr('data-quality-num', quality_list.length)
@@ -292,12 +303,12 @@ $(document).ready(function () {
                 numth_display.attr('id', situationID + '-display-' + quality_list.length)
                 numth_display.attr('data-situation-id', situationID)
                 numth_display.attr('data-quality-num', quality_list.length)
-                numth_display.attr('data-p-text', input_text)
+                numth_display.attr('data-p-text', new_input_text)
                 display.append(numth_display)
-                quality_map[situationID].push(input_text)
+                quality_map[situationID].push(new_input_text)
             }
             quality_list = quality_map[situationID]
-            var index = quality_list.indexOf(input_text)
+            var index = quality_list.indexOf(new_input_text)
             AC.add(situationID, new CharacterSelection(start, end, index), index, [start, end]);
             AC.update();
         }
@@ -309,7 +320,10 @@ $(document).ready(function () {
         var situation_id = $(this).attr("data-situation-id")
         var quality_num = $(this).attr("data-quality-num")
         var new_quality = $(this).text()
-        quality_map[situation_id][quality_num] = new_quality
+        let new_input_text = new_quality.replace(/"/g, "_QUOTE_");
+        new_input_text = new_input_text.replace(/</g, "_LEFT_");
+        new_input_text = new_input_text.replace(/>/g, "_RIGHT_");
+        quality_map[situation_id][quality_num] = new_input_text
         AC.update()
     });
     $(document).on('mouseover','.quality-span',function(e){

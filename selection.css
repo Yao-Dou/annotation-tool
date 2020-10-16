@@ -8,8 +8,17 @@
     margin: 20px;
 }
 
-#situation-0 {
+/* #situation-0 {
   margin-top: 5em;
+} */
+
+#situation-0-div {
+  margin-top: 5em;
+}
+
+.alignment {
+  vertical-align: top; 
+  display: inline-block;
 }
 
 .quality { font-size: 24px; font-weight: 300; line-height: 32px; margin: 0px; display:inline-block}
